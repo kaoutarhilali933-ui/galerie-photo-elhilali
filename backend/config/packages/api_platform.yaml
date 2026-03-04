@@ -1,6 +1,14 @@
 api_platform:
-    title: Hello API Platform
+    title: Galerie Photo API
     version: 1.0.0
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    docs_formats:
+        jsonopenapi: ['application/vnd.openapi+json']
+        html: ['text/html']
+    swagger:
+        versions: [3]
     defaults:
         stateless: true
         cache_headers:
