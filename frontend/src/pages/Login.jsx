@@ -22,17 +22,14 @@ function Login() {
 
       localStorage.setItem("token", token);
 
-      console.log("TOKEN :", token);
-      alert("Connexion réussie !");
-
       navigate("/dashboard");
     } catch (error) {
-      console.error("Erreur connexion :", error);
+      console.error("Login error:", error);
 
       if (error.response) {
-        alert("Email ou mot de passe incorrect.");
+        alert("Invalid email or password.");
       } else {
-        alert("Erreur serveur.");
+        alert("Server error.");
       }
     }
   };
@@ -41,9 +38,9 @@ function Login() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <h2 className="auth-title">Connexion</h2>
+          <h2 className="auth-title">Login</h2>
           <p className="auth-subtitle">
-            Accède à ta galerie privée et gère tes photos.
+            Sign in to access your private gallery and manage your photos.
           </p>
         </div>
 
@@ -53,7 +50,7 @@ function Login() {
             <input
               className="auth-input"
               type="email"
-              placeholder="ex: aicha@mail.com"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -61,11 +58,11 @@ function Login() {
           </div>
 
           <div className="auth-row">
-            <label className="auth-label">Mot de passe</label>
+            <label className="auth-label">Password</label>
             <input
               className="auth-input"
               type="password"
-              placeholder="********"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -73,14 +70,14 @@ function Login() {
           </div>
 
           <button className="auth-btn" type="submit">
-            Se connecter
+            Sign In
           </button>
         </form>
 
         <div className="auth-footer">
-          Pas de compte ?{" "}
+          Don&apos;t have an account?{" "}
           <Link className="auth-link" to="/register">
-            Créer un compte
+            Register
           </Link>
         </div>
       </div>
