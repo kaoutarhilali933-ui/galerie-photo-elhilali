@@ -18,17 +18,19 @@ security:
       pattern: ^/api/login_check
       stateless: true
       provider: app_user_provider
+      user_checker: App\Security\UserChecker
       json_login:
         check_path: /api/login_check
         username_path: email
         password_path: password
         success_handler: lexik_jwt_authentication.handler.authentication_success
-        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        failure_handler: App\Security\AuthenticationFailureHandler
 
     api:
       pattern: ^/api
       stateless: true
       provider: app_user_provider
+      user_checker: App\Security\UserChecker
       jwt: ~
 
   access_control:
