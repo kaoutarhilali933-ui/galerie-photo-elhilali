@@ -8,9 +8,12 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setErrorMessage("");
 
     try {
       const response = await api.post("/login_check", {
@@ -23,13 +26,20 @@ function Login() {
       localStorage.setItem("token", token);
 
       navigate("/dashboard");
+
     } catch (error) {
-      console.error("Login error:", error);
 
       if (error.response) {
-        alert("Invalid email or password.");
+
+        const message =
+          error.response.data.message ||
+          error.response.data.error ||
+          "Authentication error";
+
+        setErrorMessage(message);
+
       } else {
-        alert("Server error.");
+        setErrorMessage("Server not reachable");
       }
     }
   };
@@ -37,6 +47,7 @@ function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+
         <div className="auth-header">
           <h2 className="auth-title">Login</h2>
           <p className="auth-subtitle">
@@ -44,7 +55,14 @@ function Login() {
           </p>
         </div>
 
+        {errorMessage && (
+          <div className="auth-error">
+            ⚠ {errorMessage}
+          </div>
+        )}
+
         <form className="auth-form" onSubmit={handleSubmit}>
+
           <div className="auth-row">
             <label className="auth-label">Email</label>
             <input
@@ -72,6 +90,7 @@ function Login() {
           <button className="auth-btn" type="submit">
             Sign In
           </button>
+
         </form>
 
         <div className="auth-footer">
@@ -80,6 +99,7 @@ function Login() {
             Register
           </Link>
         </div>
+
       </div>
     </div>
   );
