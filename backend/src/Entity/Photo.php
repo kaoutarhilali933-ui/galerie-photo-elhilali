@@ -3,18 +3,38 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Controller\PhotoUploadController;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 #[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Delete(),
+        new Patch(),
+        new Post(),
+        new Post(
+            uriTemplate: '/photos/upload',
+            controller: PhotoUploadController::class,
+            deserialize: false,
+            inputFormats: [
+                'multipart' => ['multipart/form-data']
+            ]
+        )
+    ],
     normalizationContext: ['groups' => ['photo:read']],
     denormalizationContext: ['groups' => ['photo:write']]
 )]
 class Photo
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,9 +69,6 @@ class Photo
     #[ORM\Column(nullable: true)]
     #[Groups(['photo:read', 'photo:write'])]
     private ?int $publicOrder = null;
-
-
-    // ===================== GETTERS / SETTERS =====================
 
     public function getId(): ?int
     {
