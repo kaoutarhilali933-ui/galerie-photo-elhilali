@@ -13,6 +13,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
+COPY php.ini /usr/local/etc/php/conf.d/uploads.ini
+
 RUN composer install
 
 EXPOSE 8000

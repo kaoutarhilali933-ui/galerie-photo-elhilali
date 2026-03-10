@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PhotoUploadController extends AbstractController
 {
@@ -18,37 +19,35 @@ class PhotoUploadController extends AbstractController
         EntityManagerInterface $entityManager,
         #[CurrentUser] ?User $user
     ): JsonResponse {
+
         if (!$user) {
             return new JsonResponse(['message' => 'Authentication required.'], 401);
         }
 
         $file = $request->files->get('file');
 
-        if (!$file) {
+        if (!$file || !($file instanceof UploadedFile)) {
             return new JsonResponse(['message' => 'No file uploaded.'], 400);
         }
 
-        $allowedMimeTypes = ['image/jpeg', 'image/png'];
+        if (!$file->isValid()) {
+            return new JsonResponse([
+                'message' => 'Uploaded file is invalid.',
+                'error_code' => $file->getError()
+            ], 400);
+        }
+
+        $originalName = $file->getClientOriginalName();
         $mimeType = $file->getMimeType();
         $size = $file->getSize();
-        $originalName = $file->getClientOriginalName();
+        $extension = $file->guessExtension() ?: 'jpg';
 
-        if (!in_array($mimeType, $allowedMimeTypes, true)) {
-            return new JsonResponse(['message' => 'Only JPEG and PNG files are allowed.'], 400);
-        }
-
-        if ($size > 5 * 1024 * 1024) {
-            return new JsonResponse(['message' => 'File size must not exceed 5 MB.'], 400);
-        }
-
-        $extension = $file->guessExtension() ?: 'bin';
         $newFilename = uniqid('', true) . '.' . $extension;
 
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
+
         try {
-            $file->move(
-                $this->getParameter('kernel.project_dir') . '/public/uploads',
-                $newFilename
-            );
+            $file->move($uploadDir, $newFilename);
         } catch (FileException $e) {
             return new JsonResponse([
                 'message' => 'Failed to upload file.',
@@ -57,6 +56,7 @@ class PhotoUploadController extends AbstractController
         }
 
         $photo = new Photo();
+
         $photo->setUser($user);
         $photo->setFilename($newFilename);
         $photo->setOriginalName($originalName);
@@ -69,14 +69,12 @@ class PhotoUploadController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse([
-            'message' => 'Photo uploaded successfully.',
+            'message' => 'Photo uploaded successfully',
             'photo' => [
                 'id' => $photo->getId(),
                 'filename' => $photo->getFilename(),
-                'originalName' => $photo->getOriginalName(),
-                'mimeType' => $photo->getMimeType(),
-                'sizeBytes' => $photo->getSizeBytes(),
-                'uploadedAt' => $photo->getUploadedAt()?->format('Y-m-d H:i:s'),
+                'size' => $photo->getSizeBytes(),
+                'uploadedAt' => $photo->getUploadedAt()->format('Y-m-d H:i:s')
             ]
         ], 201);
     }

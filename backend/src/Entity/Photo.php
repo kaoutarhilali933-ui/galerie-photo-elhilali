@@ -43,7 +43,7 @@ class Photo
 
     #[ORM\ManyToOne(inversedBy: 'photos')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['photo:read', 'photo:write'])]
+    #[Groups(['photo:write'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
@@ -69,6 +69,14 @@ class Photo
     #[ORM\Column(nullable: true)]
     #[Groups(['photo:read', 'photo:write'])]
     private ?int $publicOrder = null;
+
+    #[ORM\Column(length: 100, options: ['default' => 'Other'])]
+    #[Groups(['photo:read', 'photo:write'])]
+    private ?string $category = 'Other';
+
+    #[ORM\Column(length: 50, options: ['default' => 'Private'])]
+    #[Groups(['photo:read', 'photo:write'])]
+    private ?string $visibility = 'Private';
 
     public function getId(): ?int
     {
@@ -149,6 +157,28 @@ class Photo
     public function setPublicOrder(?int $publicOrder): static
     {
         $this->publicOrder = $publicOrder;
+        return $this;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    public function getVisibility(): ?string
+    {
+        return $this->visibility;
+    }
+
+    public function setVisibility(string $visibility): static
+    {
+        $this->visibility = $visibility;
         return $this;
     }
 }
