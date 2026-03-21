@@ -5,7 +5,5 @@ Projet Symfony + API Platform + React.
 ## Stack
 - Backend : Symfony 6 + API Platform + JWT
 - Frontend : React (Vite)
-- Base de données : MySQL
+- Base de donnï¿½es : MySQL
 - Docker
-
-Auteur : Aïcha Lheimeur

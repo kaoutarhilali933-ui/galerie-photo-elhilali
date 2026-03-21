@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Controller\PhotoUploadController;
+use App\Controller\PublicGalleryByPseudoController;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -28,6 +29,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             inputFormats: [
                 'multipart' => ['multipart/form-data']
             ]
+        ),
+        new GetCollection(
+            uriTemplate: '/public/galleries/{pseudo}',
+            controller: PublicGalleryByPseudoController::class,
+            read: false,
+            name: 'public_gallery_by_pseudo'
         )
     ],
     normalizationContext: ['groups' => ['photo:read']],
