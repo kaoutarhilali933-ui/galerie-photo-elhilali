@@ -1,5 +1,8 @@
-function PhotoCard({ photo, onDelete }) {
+import { useState } from "react";
+
+function PhotoCard({ photo, onDelete, onPublish }) {
   const imageUrl = `http://localhost:8000/uploads/${photo.filename}`;
+  const [order, setOrder] = useState(photo.publicOrder || "");
 
   const dateStr = new Date(photo.uploadedAt).toLocaleDateString("en-US");
 
@@ -25,16 +28,40 @@ function PhotoCard({ photo, onDelete }) {
 
   return (
     <div className="photo-card">
-      <div className="photo-image-wrapper">
+      <div className="photo-image-wrapper" style={{ position: "relative" }}>
         <img
           src={imageUrl}
           alt={photo.originalName || "Photo"}
           className="photo-image"
         />
 
-        <button onClick={onDelete} className="btn-delete">
-          Delete
-        </button>
+        <div
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            alignItems: "flex-end",
+            zIndex: 10,
+          }}
+        >
+          <button
+            onClick={onDelete}
+            style={{
+              background: "#5c4033",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              borderRadius: "999px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Delete
+          </button>
+        </div>
       </div>
 
       <div className="photo-info">
@@ -66,6 +93,55 @@ function PhotoCard({ photo, onDelete }) {
             </span>
             <span className="meta-value">{getType()}</span>
           </div>
+
+          <div className="meta-item">
+            <span className="meta-left">
+              <span className="meta-icon">🌍</span>
+              <span className="meta-label">Public Order</span>
+            </span>
+            <span className="meta-value">
+              {photo.publicOrder ?? "Private"}
+            </span>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: "18px",
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+          }}
+        >
+          <input
+            type="number"
+            min="1"
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            placeholder="Order"
+            style={{
+              flex: 1,
+              padding: "10px 12px",
+              borderRadius: "10px",
+              border: "1px solid #c8b7a6",
+              outline: "none",
+            }}
+          />
+
+          <button
+            onClick={() => onPublish(order)}
+            style={{
+              background: "#a67c52",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Publish
+          </button>
         </div>
       </div>
     </div>
