@@ -1,0 +1,80 @@
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.delete-modal {
+  width: 100%;
+  max-width: 430px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  animation: deleteModalFade 0.2s ease;
+}
+
+.delete-modal-title {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2f241e;
+}
+
+.delete-modal-text {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #6e5f57;
+}
+
+.delete-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.delete-cancel-btn,
+.delete-confirm-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.delete-cancel-btn {
+  background: #ece3dc;
+  color: #4a392f;
+}
+
+.delete-cancel-btn:hover {
+  background: #e0d3ca;
+}
+
+.delete-confirm-btn {
+  background: #7b4a32;
+  color: #fff;
+}
+
+.delete-confirm-btn:hover {
+  background: #633a27;
+}
+
+@keyframes deleteModalFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

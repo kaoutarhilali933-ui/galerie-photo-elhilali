@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import PhotoCard from "../components/PhotoCard";
 import UploadModal from "../components/UploadModal";
+import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import "./dashboard.css";
 
 function Dashboard() {
   const [photos, setPhotos] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPhotoId, setSelectedPhotoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -35,16 +38,29 @@ function Dashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this photo?")) {
-      try {
-        await api.delete(`/photos/${id}`);
-        setPhotos((prev) => prev.filter((p) => p.id !== id));
-      } catch (error) {
-        console.error("Error deleting photo:", error);
-        setSuccessMessage("❌ Error while deleting photo");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      }
+  const handleDeleteClick = (id) => {
+    setSelectedPhotoId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedPhotoId) return;
+
+    try {
+      await api.delete(`/photos/${selectedPhotoId}`);
+      setPhotos((prev) => prev.filter((p) => p.id !== selectedPhotoId));
+      setShowDeleteModal(false);
+      setSelectedPhotoId(null);
+
+      setSuccessMessage("✅ Photo deleted successfully");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+      setShowDeleteModal(false);
+      setSelectedPhotoId(null);
+
+      setSuccessMessage("❌ Error while deleting photo");
+      setTimeout(() => setSuccessMessage(""), 3000);
     }
   };
 
@@ -157,7 +173,7 @@ function Dashboard() {
             <PhotoCard
               key={photo.id}
               photo={photo}
-              onDelete={() => handleDelete(photo.id)}
+              onDelete={() => handleDeleteClick(photo.id)}
               onPublish={(order) => handlePublish(photo.id, order)}
             />
           ))
@@ -172,6 +188,15 @@ function Dashboard() {
           refreshPhotos={fetchPhotos}
         />
       )}
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedPhotoId(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
