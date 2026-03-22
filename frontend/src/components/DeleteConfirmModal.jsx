@@ -1,40 +1,27 @@
-import React from "react";
 import "./deleteModal.css";
 
-export default function DeleteConfirmModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  isLoading = false,
-}) {
+function DeleteConfirmModal({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        <h2 className="modal-title">Confirm deletion</h2>
-        <p className="modal-text">
-          This photo will be permanently deleted and cannot be recovered.
+    <div className="delete-modal-overlay">
+      <div className="delete-modal">
+        <h2 className="delete-modal-title">Delete photo</h2>
+        <p className="delete-modal-text">
+          This action cannot be undone. Do you want to permanently delete this photo?
         </p>
 
-        <div className="modal-actions">
-          <button
-            className="modal-cancel-btn"
-            onClick={onClose}
-            disabled={isLoading}
-          >
+        <div className="delete-modal-actions">
+          <button className="delete-cancel-btn" onClick={onClose}>
             Cancel
           </button>
-
-          <button
-            className="modal-delete-btn"
-            onClick={onConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? "Deleting..." : "Delete"}
+          <button className="delete-confirm-btn" onClick={onConfirm}>
+            Delete
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+export default DeleteConfirmModal;
