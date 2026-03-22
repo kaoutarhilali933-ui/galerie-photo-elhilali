@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\DeletePhotoController;
 use App\Controller\PhotoUploadController;
 use App\Controller\PublicGalleryByPseudoController;
 use App\Repository\PhotoRepository;
@@ -19,7 +20,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(),
         new Get(),
-        new Delete(),
+        new Delete(
+            controller: DeletePhotoController::class,
+            read: true
+        ),
         new Patch(),
         new Post(),
         new Post(
