@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import PhotoCard from "../components/PhotoCard";
 import UploadModal from "../components/UploadModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import Navbar from "../components/Navbar";
 import "./dashboard.css";
+
+const vintageTheme = {
+  paper: "#f2e8cf",
+  ink: "#2b1d12",
+  gold: "#a67c52",
+  leather: "#5c4033",
+  danger: "#721c24",
+  success: "#155724",
+};
 
 function Dashboard() {
   const [photos, setPhotos] = useState([]);
@@ -14,22 +23,14 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const navigate = useNavigate();
-
   const fetchPhotos = async () => {
     try {
       setLoading(true);
-
       const response = await api.get("/photos");
-      console.log("GET /photos response:", response.data);
-
-      const items =
-        response.data.member || response.data["hydra:member"] || [];
-
+      const items = response.data.member || response.data["hydra:member"] || [];
       const sorted = [...items].sort(
         (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
       );
-
       setPhotos(sorted);
     } catch (error) {
       console.error("Error loading photos", error);
@@ -51,14 +52,12 @@ function Dashboard() {
       setPhotos((prev) => prev.filter((p) => p.id !== selectedPhotoId));
       setShowDeleteModal(false);
       setSelectedPhotoId(null);
-
-      setSuccessMessage("✅ Photo deleted successfully");
+      setSuccessMessage("✅ Photo archived and removed");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error deleting photo:", error);
       setShowDeleteModal(false);
       setSelectedPhotoId(null);
-
       setSuccessMessage("❌ Error while deleting photo");
       setTimeout(() => setSuccessMessage(""), 3000);
     }
@@ -68,43 +67,30 @@ function Dashboard() {
     const order = parseInt(publicOrder, 10);
 
     if (isNaN(order) || order <= 0) {
-      setSuccessMessage("❌ Please enter a valid positive number");
+      setSuccessMessage("❌ Invalid index number");
       setTimeout(() => setSuccessMessage(""), 3000);
       return;
     }
 
     try {
-      const response = await api.patch(
+      await api.patch(
         `/photos/${id}`,
         { publicOrder: order },
         {
-          headers: {
-            "Content-Type": "application/merge-patch+json",
-          },
+          headers: { "Content-Type": "application/merge-patch+json" },
         }
       );
 
-      console.log("Publish response:", response.data);
-
-      setSuccessMessage("✅ Photo published successfully");
+      setSuccessMessage("✅ Collection updated successfully");
       setTimeout(() => setSuccessMessage(""), 3000);
-
       fetchPhotos();
     } catch (error) {
       console.error("Publish error:", error);
-
       let errorMessage = "❌ Error while publishing";
 
       if (error.response?.data) {
         const apiError = error.response.data;
-
-        if (typeof apiError === "string") {
-          errorMessage = `❌ ${apiError}`;
-        } else if (apiError.detail) {
-          errorMessage = `❌ ${apiError.detail}`;
-        } else if (apiError.message) {
-          errorMessage = `❌ ${apiError.message}`;
-        }
+        errorMessage = `❌ ${apiError.detail || apiError.message || "Operation failed"}`;
       }
 
       setSuccessMessage(errorMessage);
@@ -112,91 +98,129 @@ function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   useEffect(() => {
     fetchPhotos();
   }, []);
 
+  const vStyles = {
+    pageWrapper: {
+      backgroundColor: vintageTheme.paper,
+      minHeight: "100vh",
+    },
+    mainContainer: {
+      padding: "40px 20px",
+      fontFamily: "'Georgia', serif",
+      color: vintageTheme.ink,
+    },
+    headerBox: {
+      borderBottom: `2px solid ${vintageTheme.gold}`,
+      marginBottom: "40px",
+      paddingBottom: "20px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+    },
+    title: {
+      fontSize: "2.5rem",
+      textTransform: "uppercase",
+      letterSpacing: "4px",
+      margin: 0,
+    },
+    subtitle: {
+      fontStyle: "italic",
+      opacity: 0.8,
+      fontSize: "1.1rem",
+    },
+    actionBtn: {
+      padding: "10px 20px",
+      backgroundColor: vintageTheme.leather,
+      color: vintageTheme.paper,
+      border: `1px solid ${vintageTheme.leather}`,
+      borderRadius: "4px",
+      cursor: "pointer",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+      marginLeft: "10px",
+      transition: "all 0.3s ease",
+    },
+    alert: (isError) => ({
+      background: isError ? "#f8d7da" : "#d4edda",
+      color: isError ? vintageTheme.danger : vintageTheme.success,
+      border: `1px solid ${isError ? vintageTheme.danger : vintageTheme.success}`,
+      padding: "15px 25px",
+      borderRadius: "2px",
+      marginBottom: "30px",
+      fontWeight: "bold",
+      boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
+      width: "fit-content",
+    }),
+  };
+
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <div className="dashboard-title-block">
-          <h1>My Private Gallery 📸</h1>
-          <p className="dashboard-subtitle">
-            Organize, preview and manage your personal photo collection
-          </p>
+    <div style={vStyles.pageWrapper}>
+      <Navbar />
+
+      <div style={vStyles.mainContainer}>
+        <div style={vStyles.headerBox}>
+          <div>
+            <h1 style={vStyles.title}>Curator&apos;s Desk ✍️</h1>
+            <p style={vStyles.subtitle}>Private Archive Management & Registry</p>
+          </div>
+
+          <div>
+            <button
+              style={vStyles.actionBtn}
+              onClick={() => setShowModal(true)}
+              onMouseOver={(e) => (e.target.style.backgroundColor = vintageTheme.gold)}
+              onMouseOut={(e) => (e.target.style.backgroundColor = vintageTheme.leather)}
+            >
+              Add to Archive
+            </button>
+          </div>
         </div>
 
-        <div className="dashboard-actions">
-          <button
-            className="upload-button"
-            onClick={() => setShowModal(true)}
-          >
-            Upload Photo
-          </button>
-
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </div>
-
-      {successMessage && (
-        <div
-          style={{
-            background: successMessage.includes("❌")
-              ? "#f8d7da"
-              : "#d4edda",
-            color: successMessage.includes("❌")
-              ? "#721c24"
-              : "#155724",
-            padding: "12px 20px",
-            borderRadius: "10px",
-            marginBottom: "20px",
-            fontWeight: "600",
-            width: "fit-content",
-          }}
-        >
-          {successMessage}
-        </div>
-      )}
-
-      <div className="photo-grid">
-        {loading ? (
-          <p className="status-text">Loading photos...</p>
-        ) : photos.length > 0 ? (
-          photos.map((photo) => (
-            <PhotoCard
-              key={photo.id}
-              photo={photo}
-              onDelete={() => handleDeleteClick(photo.id)}
-              onPublish={(order) => handlePublish(photo.id, order)}
-            />
-          ))
-        ) : (
-          <p className="status-text">No photos yet.</p>
+        {successMessage && (
+          <div style={vStyles.alert(successMessage.includes("❌"))}>
+            {successMessage}
+          </div>
         )}
-      </div>
 
-      {showModal && (
-        <UploadModal
-          onClose={() => setShowModal(false)}
-          refreshPhotos={fetchPhotos}
+        <div className="photo-grid" style={{ gap: "40px" }}>
+          {loading ? (
+            <p style={{ textAlign: "center", fontStyle: "italic" }}>
+              Consulting the archives...
+            </p>
+          ) : photos.length > 0 ? (
+            photos.map((photo) => (
+              <PhotoCard
+                key={photo.id}
+                photo={photo}
+                onDelete={() => handleDeleteClick(photo.id)}
+                onPublish={(order) => handlePublish(photo.id, order)}
+              />
+            ))
+          ) : (
+            <div style={{ textAlign: "center", padding: "100px", opacity: 0.5 }}>
+              <span style={{ fontSize: "50px" }}>📔</span>
+              <p>No records found in this collection.</p>
+            </div>
+          )}
+        </div>
+
+        {showModal && (
+          <UploadModal onClose={() => setShowModal(false)} refreshPhotos={fetchPhotos} />
+        )}
+
+        <DeleteConfirmModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedPhotoId(null);
+          }}
+          onConfirm={confirmDelete}
         />
-      )}
-
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setSelectedPhotoId(null);
-        }}
-        onConfirm={confirmDelete}
-      />
+      </div>
     </div>
   );
 }

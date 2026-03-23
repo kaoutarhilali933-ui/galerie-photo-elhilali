@@ -38,4 +38,11 @@ security:
     - { path: ^/api/docs, roles: PUBLIC_ACCESS }
     - { path: ^/api/users$, methods: [POST], roles: PUBLIC_ACCESS }
     - { path: ^/api/public, roles: PUBLIC_ACCESS }
+
+    # ✅ download public
+    - { path: ^/api/photos/[0-9]+/download$, roles: PUBLIC_ACCESS }
+
+    # 🔐 admin
+    - { path: ^/api/admin, roles: ROLE_ADMIN }
+
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

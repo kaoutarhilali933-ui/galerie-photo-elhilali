@@ -1,0 +1,99 @@
+body {
+  background-color: #f4f6f9;
+  font-family: Arial, sans-serif;
+}
+
+.admin-container {
+  padding: 30px;
+}
+
+.admin-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  padding: 10px;
+  width: 300px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-table thead {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  text-align: center;
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #e6f0ff;
+}
+
+.role-admin {
+  background-color: #27ae60;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.role-user {
+  background-color: #3498db;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.status-active {
+  color: green;
+  font-weight: bold;
+}
+
+.status-blocked {
+  color: red;
+  font-weight: bold;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+.btn-unblock {
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-unblock:hover {
+  background-color: #d68910;
+}
