@@ -26,14 +26,19 @@ function Dashboard() {
   const fetchPhotos = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/photos");
-      const items = response.data.member || response.data["hydra:member"] || [];
+
+      // ✅ on charge seulement les photos du user connecté
+      const response = await api.get("/my/photos");
+      const items = Array.isArray(response.data) ? response.data : [];
+
       const sorted = [...items].sort(
         (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
       );
+
       setPhotos(sorted);
     } catch (error) {
       console.error("Error loading photos", error);
+      setPhotos([]);
     } finally {
       setLoading(false);
     }

@@ -19,7 +19,6 @@ class PhotoUploadController extends AbstractController
         EntityManagerInterface $entityManager,
         #[CurrentUser] ?User $user
     ): JsonResponse {
-
         if (!$user) {
             return new JsonResponse(['message' => 'Authentication required.'], 401);
         }
@@ -65,6 +64,10 @@ class PhotoUploadController extends AbstractController
         $photo->setUploadedAt(new \DateTime());
         $photo->setPublicOrder(null);
 
+        // Valeurs par défaut pour ne pas casser la galerie publique
+        $photo->setVisibility('Public');
+        $photo->setCategory('Other');
+
         $entityManager->persist($photo);
         $entityManager->flush();
 
@@ -73,8 +76,12 @@ class PhotoUploadController extends AbstractController
             'photo' => [
                 'id' => $photo->getId(),
                 'filename' => $photo->getFilename(),
+                'originalName' => $photo->getOriginalName(),
                 'size' => $photo->getSizeBytes(),
-                'uploadedAt' => $photo->getUploadedAt()->format('Y-m-d H:i:s')
+                'uploadedAt' => $photo->getUploadedAt()->format('Y-m-d H:i:s'),
+                'visibility' => $photo->getVisibility(),
+                'category' => $photo->getCategory(),
+                'pseudo' => $photo->getUser()?->getPseudo(),
             ]
         ], 201);
     }

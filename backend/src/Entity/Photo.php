@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Controller\DeletePhotoController;
+use App\Controller\MyPhotosController;
 use App\Controller\PhotoUploadController;
 use App\Controller\PublicGalleryByPseudoController;
+use App\Controller\PublicUsersController;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -39,6 +41,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
             controller: PublicGalleryByPseudoController::class,
             read: false,
             name: 'public_gallery_by_pseudo'
+        ),
+        new GetCollection(
+            uriTemplate: '/public/users',
+            controller: PublicUsersController::class,
+            read: false,
+            name: 'public_users'
+        ),
+        new GetCollection(
+            uriTemplate: '/my/photos',
+            controller: MyPhotosController::class,
+            read: false,
+            name: 'my_photos'
         )
     ],
     normalizationContext: ['groups' => ['photo:read']],
