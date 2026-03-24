@@ -19,9 +19,11 @@ class PhotoRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.user', 'u')
             ->andWhere('u.pseudo = :pseudo')
-            ->andWhere('p.publicOrder IS NOT NULL')
+            ->andWhere('LOWER(p.visibility) = :visibility')
             ->setParameter('pseudo', $pseudo)
+            ->setParameter('visibility', 'public')
             ->orderBy('p.publicOrder', 'ASC')
+            ->addOrderBy('p.uploadedAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -29,14 +31,31 @@ class PhotoRepository extends ServiceEntityRepository
     public function findPublicPseudos(): array
     {
         $results = $this->createQueryBuilder('p')
-            ->select('DISTINCT u.pseudo')
+            ->select('DISTINCT u.pseudo AS pseudo')
             ->join('p.user', 'u')
-            ->andWhere('p.publicOrder IS NOT NULL')
+            ->andWhere('LOWER(p.visibility) = :visibility')
+            ->andWhere('u.pseudo IS NOT NULL')
+            ->setParameter('visibility', 'public')
             ->orderBy('u.pseudo', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
         return array_column($results, 'pseudo');
+    }
+
+    public function findPublicUsers(): array
+    {
+        $results = $this->createQueryBuilder('p')
+            ->select('DISTINCT u.pseudo AS pseudo')
+            ->join('p.user', 'u')
+            ->andWhere('LOWER(p.visibility) = :visibility')
+            ->andWhere('u.pseudo IS NOT NULL')
+            ->setParameter('visibility', 'public')
+            ->orderBy('u.pseudo', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(fn ($row) => $row['pseudo'], $results);
     }
 
     public function isPublicOrderUsedByUser(User $user, int $publicOrder, ?int $excludePhotoId = null): bool
