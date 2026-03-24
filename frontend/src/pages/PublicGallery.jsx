@@ -339,11 +339,21 @@ function PublicGallery() {
                     <img
                       src={`http://localhost:8000/uploads/${photo.filename}`}
                       alt={photo.originalName}
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={(e) => {
+                        e.currentTarget.style.opacity = "1";
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
                       style={{
                         width: "100%",
                         aspectRatio: "1/1",
                         objectFit: "cover",
                         filter: "sepia(0.15) contrast(1.1)",
+                        opacity: 0,
+                        transform: "scale(1.01)",
+                        transition: "opacity 0.4s ease, transform 0.4s ease",
+                        backgroundColor: "#e7dcc5",
                       }}
                     />
 

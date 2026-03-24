@@ -33,6 +33,18 @@ function PhotoCard({ photo, onDelete, onPublish }) {
           src={imageUrl}
           alt={photo.originalName || "Photo"}
           className="photo-image"
+          loading="lazy"
+          decoding="async"
+          onLoad={(e) => {
+            e.currentTarget.style.opacity = "1";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+          style={{
+            opacity: 0,
+            transform: "scale(1.01)",
+            transition: "opacity 0.4s ease, transform 0.4s ease",
+            backgroundColor: "#e7dcc5",
+          }}
         />
 
         <div
