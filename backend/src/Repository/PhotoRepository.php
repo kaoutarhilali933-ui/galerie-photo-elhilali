@@ -20,6 +20,7 @@ class PhotoRepository extends ServiceEntityRepository
             ->join('p.user', 'u')
             ->andWhere('u.pseudo = :pseudo')
             ->andWhere('LOWER(p.visibility) = :visibility')
+            ->andWhere('p.publicOrder IS NOT NULL') // ✅ FIX IMPORTANT
             ->setParameter('pseudo', $pseudo)
             ->setParameter('visibility', 'public')
             ->orderBy('p.publicOrder', 'ASC')
@@ -34,6 +35,7 @@ class PhotoRepository extends ServiceEntityRepository
             ->select('DISTINCT u.pseudo AS pseudo')
             ->join('p.user', 'u')
             ->andWhere('LOWER(p.visibility) = :visibility')
+            ->andWhere('p.publicOrder IS NOT NULL') // ✅ AJOUTÉ
             ->andWhere('u.pseudo IS NOT NULL')
             ->setParameter('visibility', 'public')
             ->orderBy('u.pseudo', 'ASC')
@@ -49,6 +51,7 @@ class PhotoRepository extends ServiceEntityRepository
             ->select('DISTINCT u.pseudo AS pseudo')
             ->join('p.user', 'u')
             ->andWhere('LOWER(p.visibility) = :visibility')
+            ->andWhere('p.publicOrder IS NOT NULL') // ✅ AJOUTÉ
             ->andWhere('u.pseudo IS NOT NULL')
             ->setParameter('visibility', 'public')
             ->orderBy('u.pseudo', 'ASC')
