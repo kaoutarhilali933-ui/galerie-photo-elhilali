@@ -15,19 +15,41 @@ use App\Controller\PublicGalleryByPseudoController;
 use App\Controller\PublicUsersController;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
+
+/**
+ *  Contrainte DB : empêche 2 photos avec même publicOrder pour un user
+ */
+#[ORM\Table(name: 'photo', uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'uniq_user_public_order', columns: ['user_id', 'public_order'])
+])]
+
+/**
+ *  Contrainte Symfony : message propre si doublon
+ */
+#[UniqueEntity(
+    fields: ['user', 'publicOrder'],
+    message: 'This order number is already used for another photo.'
+)]
+
 #[ApiResource(
     operations: [
         new GetCollection(),
         new Get(),
+
         new Delete(
             controller: DeletePhotoController::class,
             read: true
         ),
+
         new Patch(),
+
         new Post(),
+
+        //  Upload photo
         new Post(
             uriTemplate: '/photos/upload',
             controller: PhotoUploadController::class,
@@ -36,18 +58,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'multipart' => ['multipart/form-data']
             ]
         ),
+
+        //  Galerie publique
         new GetCollection(
             uriTemplate: '/public/galleries/{pseudo}',
             controller: PublicGalleryByPseudoController::class,
             read: false,
             name: 'public_gallery_by_pseudo'
         ),
+
+        // 👥 Liste utilisateurs publics
         new GetCollection(
             uriTemplate: '/public/users',
             controller: PublicUsersController::class,
             read: false,
             name: 'public_users'
         ),
+
+        // 🔐 Mes photos privées
         new GetCollection(
             uriTemplate: '/my/photos',
             controller: MyPhotosController::class,
@@ -91,6 +119,10 @@ class Photo
     #[Groups(['photo:read'])]
     private ?\DateTimeInterface $uploadedAt = null;
 
+    /**
+     *  Ordre d'affichage public
+     * NULL = privé
+     */
     #[ORM\Column(nullable: true)]
     #[Groups(['photo:read', 'photo:write'])]
     private ?int $publicOrder = null;
@@ -99,9 +131,15 @@ class Photo
     #[Groups(['photo:read', 'photo:write'])]
     private ?string $category = 'Other';
 
+    /**
+     *  visibilité
+     * Private / Public
+     */
     #[ORM\Column(length: 50, options: ['default' => 'Private'])]
     #[Groups(['photo:read', 'photo:write'])]
     private ?string $visibility = 'Private';
+
+    // ===================== GETTERS / SETTERS =====================
 
     public function getId(): ?int
     {
